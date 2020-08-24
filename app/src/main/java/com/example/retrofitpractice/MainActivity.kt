@@ -1,16 +1,16 @@
 package com.example.retrofitpractice
 
 import ApiService
+import adapter.Adapter
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_main.*
 import models.PlaceResponse
 import network.Constant
 import retrofit2.Call
@@ -21,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var placeAdapter: Adapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +30,18 @@ class MainActivity : AppCompatActivity() {
             val policy = ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
         }
+        placeAdapter = Adapter(arrayListOf())
+        println(placeAdapter.itemCount)
+        recycler_view.adapter = placeAdapter
+        recycler_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        val layoutManager:RecyclerView.LayoutManager = LinearLayoutManager(this)
+        recycler_view.layoutManager = layoutManager
        fetchData()
     }
+
+
+
     private fun fetchData() {
         val retrofit = Retrofit.Builder()
             .baseUrl(Constant.baseUrl)
@@ -52,10 +63,17 @@ class MainActivity : AppCompatActivity() {
             ) {
 
                 if (response.isSuccessful) {
+                    val list=response.body()?.places;
+                    if (list != null) {
+                        response.body().let {
+                            if (it != null) {
+                                println(it.places)
+                                placeAdapter.placeList=it.places;
+                            }
+                        }
 
-                    val texting:TextView = findViewById<TextView>(R.id.textView)
-                    //var placeRes=PlaceResponse(response);
-                    texting.text=response.body()?.places?.get(1)?.name;
+                    }
+                    placeAdapter.notifyDataSetChanged()
 
                 }
                 else{
