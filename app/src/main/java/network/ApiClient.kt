@@ -1,18 +1,20 @@
 package network
 
+import ApiService
+import com.google.gson.GsonBuilder
 import network.Constant
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 object ApiClient {
-
-    private var retrofit: Retrofit? = null
-
-    fun getClient(): Retrofit {
-        if (retrofit == null)
-            retrofit =
-                Retrofit.Builder().baseUrl(Constant.baseUrl).addConverterFactory(GsonConverterFactory.create()).build()
-
-        return retrofit as Retrofit
-    }
+    val getClient: ApiService
+        get() {
+            val gson = GsonBuilder().setLenient().create()
+            val client = OkHttpClient.Builder().build()
+            val retrofit = Retrofit.Builder().baseUrl(Constant.baseUrl).client(client)
+                .addConverterFactory(GsonConverterFactory.create(gson)).build()
+            return retrofit.create(ApiService::class.java)
+        }
 }

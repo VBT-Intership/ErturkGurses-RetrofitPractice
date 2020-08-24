@@ -1,5 +1,5 @@
 package network
 
 object Constant {
-    var baseUrl: String = "localhost:3000"
+    var baseUrl: String = "https://meetapi.herokuapp.com"
 }
